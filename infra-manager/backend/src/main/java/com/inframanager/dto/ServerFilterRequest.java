@@ -13,9 +13,9 @@ public class ServerFilterRequest {
 
     private String environment;
     private String datacenter;
-    private String availabilityZone;
-    private String usageRole;
-    private String os;
-    private String vmType;
+    private String zone;
+    private String software;
+    private String osType;
+    private String serverType;
     private String status;
 }

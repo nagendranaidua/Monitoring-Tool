@@ -25,35 +25,35 @@ ON CONFLICT DO NOTHING;
 SELECT setval('applications_id_seq', 3);
 
 -- Servers for Application1
-INSERT INTO servers (id, application_id, machine_name, alias, ip_address, environment, availability_zone, datacenter, os, vm_server, vm_type, os_version, cpu, ram, disk, usage_role, is_app_server, ssh_username, ssh_port, remark, tadp_ref, status) VALUES
-  (1,  1, 'machine1',  'NOSAPACHEA01', '10.1.1.10', 'PRODUCTION',  'A', 'DC1', 'Linux', true, 'VMWare', 'RHEL 7.6', 4,  '4 GB',   '100 GB', 'Apache',    true,  'svc_infra', 22, 'Apache 2.4.62', 'TADP-001', 'ACTIVE'),
-  (2,  1, 'machine2',  'NOSAPACHEB01', '10.1.1.11', 'PRODUCTION',  'B', 'DC1', 'Linux', true, 'VMWare', 'RHEL 7.6', 4,  '4 GB',   '100 GB', 'Apache',    true,  'svc_infra', 22, 'Apache 2.4.62', 'TADP-002', 'ACTIVE'),
-  (3,  1, 'machine3',  'NOSWLSA01',    '10.1.2.10', 'PRODUCTION',  'A', 'DC1', 'Linux', true, 'VMWare', 'RHEL 8.4', 8,  '16 GB',  '200 GB', 'WebLogic',  true,  'svc_infra', 22, 'WebLogic 14c',  'TADP-003', 'ACTIVE'),
-  (4,  1, 'machine4',  'NOSWLSB01',    '10.1.2.11', 'PRODUCTION',  'B', 'DC1', 'Linux', true, 'VMWare', 'RHEL 8.4', 8,  '16 GB',  '200 GB', 'WebLogic',  true,  'svc_infra', 22, 'WebLogic 14c',  'TADP-004', 'ACTIVE'),
-  (5,  1, 'machine5',  'NOSTIBCOA01',  '10.1.3.10', 'PRODUCTION',  'A', 'DC2', 'Linux', true, 'VMWare', 'RHEL 7.9', 16, '32 GB',  '500 GB', 'TIBCO',     true,  'svc_infra', 22, 'TIBCO EMS 8.6', 'TADP-005', 'ACTIVE'),
-  (6,  1, 'machine6',  'NOSTIBCOB01',  '10.1.3.11', 'PRODUCTION',  'B', 'DC2', 'Linux', true, 'VMWare', 'RHEL 7.9', 16, '32 GB',  '500 GB', 'TIBCO',     true,  'svc_infra', 22, 'TIBCO EMS 8.6', 'TADP-006', 'ACTIVE'),
-  (7,  1, 'machine7',  'NOSAPPA01',    '10.1.4.10', 'PRODUCTION',  'A', 'DC1', 'Linux', true, 'VMWare', 'RHEL 8.4', 8,  '16 GB',  '200 GB', 'AppServer', true,  'svc_infra', 22, 'Spring Boot',   'TADP-007', 'ACTIVE'),
-  (8,  1, 'machine8',  'NOSAPPA02',    '10.1.4.11', 'PRODUCTION',  'A', 'DC1', 'Linux', true, 'VMWare', 'RHEL 8.4', 8,  '16 GB',  '200 GB', 'AppServer', true,  'svc_infra', 22, 'Spring Boot',   'TADP-008', 'ACTIVE'),
-  (9,  1, 'machine9',  'NOSAPPB01',    '10.1.4.20', 'PRODUCTION',  'B', 'DC2', 'Linux', true, 'VMWare', 'RHEL 8.4', 8,  '16 GB',  '200 GB', 'AppServer', true,  'svc_infra', 22, 'Spring Boot',   'TADP-009', 'ACTIVE'),
-  (10, 1, 'machine10', 'NOSAPPB02',    '10.1.4.21', 'PRODUCTION',  'B', 'DC2', 'Linux', true, 'VMWare', 'RHEL 8.4', 8,  '16 GB',  '200 GB', 'AppServer', true,  'svc_infra', 22, 'Spring Boot',   'TADP-010', 'ACTIVE'),
-  (11, 1, 'machine11', 'NOSUATA01',    '10.1.5.10', 'UAT',         'A', 'DC1', 'Linux', true, 'VMWare', 'RHEL 8.4', 4,  '8 GB',   '100 GB', 'AppServer', true,  'svc_infra', 22, 'UAT Environment','TADP-011', 'ACTIVE'),
-  (12, 1, 'machine12', 'NOSDEVA01',    '10.1.6.10', 'DEVELOPMENT', 'A', 'DC1', 'Linux', true, 'VMWare', 'RHEL 8.4', 4,  '8 GB',   '100 GB', 'AppServer', true,  'svc_infra', 22, 'Dev Environment','TADP-012', 'ACTIVE')
+INSERT INTO servers (id, application_id, server_name, alias, ip_address, environment, zone, datacenter, os_type, os_version, server_type, cpu_count, cpu_cores, ram_gb, disk_size, software, ssh_username, ssh_port, remarks, status) VALUES
+  (1,  1, 'machine1',  'NOSAPACHEA01', '10.1.1.10', 'PRODUCTION',  'A', 'DC1', 'Linux', 'RHEL 7.6', 'VM', 1, 4,  4,   '100 GB', 'Apache',    'svc_infra', 22, 'Apache 2.4.62', 'ACTIVE'),
+  (2,  1, 'machine2',  'NOSAPACHEB01', '10.1.1.11', 'PRODUCTION',  'B', 'DC1', 'Linux', 'RHEL 7.6', 'VM', 1, 4,  4,   '100 GB', 'Apache',    'svc_infra', 22, 'Apache 2.4.62', 'ACTIVE'),
+  (3,  1, 'machine3',  'NOSWLSA01',    '10.1.2.10', 'PRODUCTION',  'A', 'DC1', 'Linux', 'RHEL 8.4', 'VM', 1, 8,  16,  '200 GB', 'WebLogic',  'svc_infra', 22, 'WebLogic 14c',  'ACTIVE'),
+  (4,  1, 'machine4',  'NOSWLSB01',    '10.1.2.11', 'PRODUCTION',  'B', 'DC1', 'Linux', 'RHEL 8.4', 'VM', 1, 8,  16,  '200 GB', 'WebLogic',  'svc_infra', 22, 'WebLogic 14c',  'ACTIVE'),
+  (5,  1, 'machine5',  'NOSTIBCOA01',  '10.1.3.10', 'PRODUCTION',  'A', 'DC2', 'Linux', 'RHEL 7.9', 'VM', 1, 16, 32,  '500 GB', 'TIBCO',     'svc_infra', 22, 'TIBCO EMS 8.6', 'ACTIVE'),
+  (6,  1, 'machine6',  'NOSTIBCOB01',  '10.1.3.11', 'PRODUCTION',  'B', 'DC2', 'Linux', 'RHEL 7.9', 'VM', 1, 16, 32,  '500 GB', 'TIBCO',     'svc_infra', 22, 'TIBCO EMS 8.6', 'ACTIVE'),
+  (7,  1, 'machine7',  'NOSAPPA01',    '10.1.4.10', 'PRODUCTION',  'A', 'DC1', 'Linux', 'RHEL 8.4', 'VM', 1, 8,  16,  '200 GB', 'AppServer', 'svc_infra', 22, 'Spring Boot',   'ACTIVE'),
+  (8,  1, 'machine8',  'NOSAPPA02',    '10.1.4.11', 'PRODUCTION',  'A', 'DC1', 'Linux', 'RHEL 8.4', 'VM', 1, 8,  16,  '200 GB', 'AppServer', 'svc_infra', 22, 'Spring Boot',   'ACTIVE'),
+  (9,  1, 'machine9',  'NOSAPPB01',    '10.1.4.20', 'PRODUCTION',  'B', 'DC2', 'Linux', 'RHEL 8.4', 'VM', 1, 8,  16,  '200 GB', 'AppServer', 'svc_infra', 22, 'Spring Boot',   'ACTIVE'),
+  (10, 1, 'machine10', 'NOSAPPB02',    '10.1.4.21', 'PRODUCTION',  'B', 'DC2', 'Linux', 'RHEL 8.4', 'VM', 1, 8,  16,  '200 GB', 'AppServer', 'svc_infra', 22, 'Spring Boot',   'ACTIVE'),
+  (11, 1, 'machine11', 'NOSUATA01',    '10.1.5.10', 'UAT',         'A', 'DC1', 'Linux', 'RHEL 8.4', 'VM', 1, 4,  8,   '100 GB', 'AppServer', 'svc_infra', 22, 'UAT Environment','ACTIVE'),
+  (12, 1, 'machine12', 'NOSDEVA01',    '10.1.6.10', 'DEVELOPMENT', 'A', 'DC1', 'Linux', 'RHEL 8.4', 'VM', 1, 4,  8,   '100 GB', 'AppServer', 'svc_infra', 22, 'Dev Environment','ACTIVE')
 ON CONFLICT DO NOTHING;
 
 -- Servers for Application2
-INSERT INTO servers (id, application_id, machine_name, alias, ip_address, environment, availability_zone, datacenter, os, vm_server, vm_type, os_version, cpu, ram, disk, usage_role, is_app_server, ssh_username, ssh_port, status) VALUES
-  (13, 2, 'risk-srv1', 'RISKA01',  '10.2.1.10', 'PRODUCTION', 'A', 'DC1', 'Linux', true, 'VMWare', 'RHEL 8.4', 16, '64 GB', '1 TB',  'AppServer', true, 'svc_risk', 22, 'ACTIVE'),
-  (14, 2, 'risk-srv2', 'RISKA02',  '10.2.1.11', 'PRODUCTION', 'A', 'DC1', 'Linux', true, 'VMWare', 'RHEL 8.4', 16, '64 GB', '1 TB',  'AppServer', true, 'svc_risk', 22, 'ACTIVE'),
-  (15, 2, 'risk-srv3', 'RISKB01',  '10.2.1.20', 'PRODUCTION', 'B', 'DC2', 'Linux', true, 'VMWare', 'RHEL 8.4', 16, '64 GB', '1 TB',  'AppServer', true, 'svc_risk', 22, 'ACTIVE'),
-  (16, 2, 'risk-db1',  'RISKDB01', '10.2.2.10', 'PRODUCTION', 'A', 'DC1', 'Linux', true, 'VMWare', 'RHEL 8.4', 8,  '32 GB', '2 TB',  'Database',  false,'svc_risk', 22, 'ACTIVE')
+INSERT INTO servers (id, application_id, server_name, alias, ip_address, environment, zone, datacenter, os_type, os_version, server_type, cpu_count, cpu_cores, ram_gb, disk_size, software, ssh_username, ssh_port, status) VALUES
+  (13, 2, 'risk-srv1', 'RISKA01',  '10.2.1.10', 'PRODUCTION', 'A', 'DC1', 'Linux', 'RHEL 8.4', 'VM', 2, 16, 64, '1 TB',  'AppServer', 'svc_risk', 22, 'ACTIVE'),
+  (14, 2, 'risk-srv2', 'RISKA02',  '10.2.1.11', 'PRODUCTION', 'A', 'DC1', 'Linux', 'RHEL 8.4', 'VM', 2, 16, 64, '1 TB',  'AppServer', 'svc_risk', 22, 'ACTIVE'),
+  (15, 2, 'risk-srv3', 'RISKB01',  '10.2.1.20', 'PRODUCTION', 'B', 'DC2', 'Linux', 'RHEL 8.4', 'VM', 2, 16, 64, '1 TB',  'AppServer', 'svc_risk', 22, 'ACTIVE'),
+  (16, 2, 'risk-db1',  'RISKDB01', '10.2.2.10', 'PRODUCTION', 'A', 'DC1', 'Linux', 'RHEL 8.4', 'VM', 1, 8,  32, '2 TB',  'Database',  'svc_risk', 22, 'ACTIVE')
 ON CONFLICT DO NOTHING;
 
 -- Servers for Application3
-INSERT INTO servers (id, application_id, machine_name, alias, ip_address, environment, availability_zone, datacenter, os, vm_server, vm_type, os_version, cpu, ram, disk, usage_role, is_app_server, ssh_username, ssh_port, status) VALUES
-  (17, 3, 'portal-web1', 'PORTALWEB01', '10.3.1.10', 'PRODUCTION', 'A', 'DC1', 'Linux', true, 'VMWare', 'RHEL 8.4', 4, '8 GB',  '100 GB', 'WebServer',  true,  'svc_portal', 22, 'ACTIVE'),
-  (18, 3, 'portal-web2', 'PORTALWEB02', '10.3.1.11', 'PRODUCTION', 'B', 'DC2', 'Linux', true, 'VMWare', 'RHEL 8.4', 4, '8 GB',  '100 GB', 'WebServer',  true,  'svc_portal', 22, 'ACTIVE'),
-  (19, 3, 'portal-app1', 'PORTALAPP01', '10.3.2.10', 'PRODUCTION', 'A', 'DC1', 'Linux', true, 'VMWare', 'RHEL 8.4', 8, '16 GB', '200 GB', 'AppServer',  true,  'svc_portal', 22, 'ACTIVE'),
-  (20, 3, 'portal-app2', 'PORTALAPP02', '10.3.2.11', 'PRODUCTION', 'B', 'DC2', 'Linux', true, 'VMWare', 'RHEL 8.4', 8, '16 GB', '200 GB', 'AppServer',  true,  'svc_portal', 22, 'ACTIVE')
+INSERT INTO servers (id, application_id, server_name, alias, ip_address, environment, zone, datacenter, os_type, os_version, server_type, cpu_count, cpu_cores, ram_gb, disk_size, software, ssh_username, ssh_port, status) VALUES
+  (17, 3, 'portal-web1', 'PORTALWEB01', '10.3.1.10', 'PRODUCTION', 'A', 'DC1', 'Linux', 'RHEL 8.4', 'VM', 1, 4, 8,  '100 GB', 'WebServer',  'svc_portal', 22, 'ACTIVE'),
+  (18, 3, 'portal-web2', 'PORTALWEB02', '10.3.1.11', 'PRODUCTION', 'B', 'DC2', 'Linux', 'RHEL 8.4', 'VM', 1, 4, 8,  '100 GB', 'WebServer',  'svc_portal', 22, 'ACTIVE'),
+  (19, 3, 'portal-app1', 'PORTALAPP01', '10.3.2.10', 'PRODUCTION', 'A', 'DC1', 'Linux', 'RHEL 8.4', 'VM', 1, 8, 16, '200 GB', 'AppServer',  'svc_portal', 22, 'ACTIVE'),
+  (20, 3, 'portal-app2', 'PORTALAPP02', '10.3.2.11', 'PRODUCTION', 'B', 'DC2', 'Linux', 'RHEL 8.4', 'VM', 1, 8, 16, '200 GB', 'AppServer',  'svc_portal', 22, 'ACTIVE')
 ON CONFLICT DO NOTHING;
 SELECT setval('servers_id_seq', 20);
 

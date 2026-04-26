@@ -119,34 +119,45 @@ public class ExcelImportService {
         Server.ServerBuilder builder = Server.builder();
         builder.application(app);
 
-        builder.tadpHostname(getStringValue(row, columnMap, "TADP hostnames"));
-        builder.machineName(getStringValue(row, columnMap, "Machine name"));
+        // Try new header first, fall back to old header for backward compatibility
+        builder.tadpHostname(getStringValueWithFallback(row, columnMap,
+                "TADP hostnames (previously Physical ESX)", "TADP hostnames"));
+        builder.serverName(getStringValueWithFallback(row, columnMap,
+                "Server Name", "Machine name"));
         builder.alias(getStringValue(row, columnMap, "Alias"));
         builder.ipAddress(getStringValue(row, columnMap, "IP Address"));
-        builder.environment(getStringValue(row, columnMap, "Current role"));
-        builder.availabilityZone(getStringValue(row, columnMap, "Availability Zone"));
-        builder.datacenter(getStringValue(row, columnMap, "Datacenter"));
-        builder.os(getStringValue(row, columnMap, "OS"));
-        builder.vmServer(parseYesNo(getStringValue(row, columnMap, "VM Server")));
-        builder.vmType(getStringValue(row, columnMap, "Type"));
-        builder.osVersion(getStringValue(row, columnMap, "Version"));
-        builder.cpu(parseInteger(getStringValue(row, columnMap, "CPU")));
-        builder.ram(getStringValue(row, columnMap, "RAM"));
-        builder.disk(getStringValue(row, columnMap, "DISK"));
-        builder.usageRole(getStringValue(row, columnMap, "Usage"));
-        builder.isAppServer(parseYesNo(getStringValue(row, columnMap, "Application Server")));
-        builder.remark(getStringValue(row, columnMap, "Remark"));
-        builder.tadpRef(getStringValue(row, columnMap, "TADP Ref"));
+        builder.environment(getStringValueWithFallback(row, columnMap,
+                "Environment", "Current role"));
+        builder.datacenter(getStringValueWithFallback(row, columnMap,
+                "Data Center", "Datacenter"));
+        builder.zone(getStringValueWithFallback(row, columnMap,
+                "Zone", "Availability Zone"));
+        builder.osType(getStringValueWithFallback(row, columnMap,
+                "OS Type", "OS"));
+        builder.osVersion(getStringValueWithFallback(row, columnMap,
+                "OS Version", "Version"));
+        builder.serverType(getStringValueWithFallback(row, columnMap,
+                "Server Type", "Type"));
+        builder.cpuCount(parseInteger(getStringValue(row, columnMap, "CPU Count")));
+        builder.cpuCores(parseInteger(getStringValueWithFallback(row, columnMap,
+                "CPU Cores", "CPU")));
+        builder.ramGb(parseInteger(getStringValueWithFallback(row, columnMap,
+                "RAM (GB)", "RAM")));
+        builder.diskSize(getStringValueWithFallback(row, columnMap,
+                "Disk Size", "DISK"));
+        builder.software(getStringValueWithFallback(row, columnMap,
+                "Software", "Usage"));
+        builder.remarks(getStringValueWithFallback(row, columnMap,
+                "Remarks", "Remark"));
         builder.status(Server.Status.ACTIVE);
         builder.sshPort(22);
 
         // Validate required fields
         Server server = builder.build();
-        if (server.getMachineName() == null || server.getMachineName().isBlank()) {
-            throw new IllegalArgumentException("Machine name is required");
+        if (server.getServerName() == null || server.getServerName().isBlank()) {
+            throw new IllegalArgumentException("Server name is required");
         }
         if (server.getIpAddress() == null || server.getIpAddress().isBlank()) {
-            // Use machine name as fallback
             server.setIpAddress("0.0.0.0");
         }
         if (server.getEnvironment() == null || server.getEnvironment().isBlank()) {
@@ -154,6 +165,15 @@ public class ExcelImportService {
         }
 
         return server;
+    }
+
+    private String getStringValueWithFallback(Row row, Map<String, Integer> columnMap,
+                                               String primaryColumn, String fallbackColumn) {
+        String value = getStringValue(row, columnMap, primaryColumn);
+        if (value == null) {
+            value = getStringValue(row, columnMap, fallbackColumn);
+        }
+        return value;
     }
 
     private String getStringValue(Row row, Map<String, Integer> columnMap, String columnName) {
@@ -196,14 +216,6 @@ public class ExcelImportService {
             }
             default -> null;
         };
-    }
-
-    private Boolean parseYesNo(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
-        String v = value.trim().toLowerCase();
-        return "yes".equals(v) || "y".equals(v) || "true".equals(v);
     }
 
     private Integer parseInteger(String value) {

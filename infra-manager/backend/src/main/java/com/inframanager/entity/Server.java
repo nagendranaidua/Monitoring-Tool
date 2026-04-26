@@ -29,8 +29,8 @@ public class Server {
     @EqualsAndHashCode.Exclude
     private Application application;
 
-    @Column(name = "machine_name", nullable = false, length = 100)
-    private String machineName;
+    @Column(name = "server_name", nullable = false, length = 200)
+    private String serverName;
 
     @Column(name = "alias", length = 100)
     private String alias;
@@ -38,41 +38,38 @@ public class Server {
     @Column(name = "ip_address", nullable = false, length = 45)
     private String ipAddress;
 
-    @Column(name = "environment", nullable = false, length = 30)
+    @Column(name = "environment", nullable = false, length = 50)
     private String environment;
 
-    @Column(name = "availability_zone", length = 10)
-    private String availabilityZone;
-
-    @Column(name = "datacenter", length = 50)
+    @Column(name = "datacenter", length = 100)
     private String datacenter;
 
-    @Column(name = "os", length = 30)
-    private String os;
+    @Column(name = "zone", length = 10)
+    private String zone;
 
-    @Column(name = "vm_server")
-    private Boolean vmServer;
-
-    @Column(name = "vm_type", length = 30)
-    private String vmType;
+    @Column(name = "os_type", length = 30)
+    private String osType;
 
     @Column(name = "os_version", length = 30)
     private String osVersion;
 
-    @Column(name = "cpu")
-    private Integer cpu;
+    @Column(name = "server_type", length = 100)
+    private String serverType;
 
-    @Column(name = "ram", length = 20)
-    private String ram;
+    @Column(name = "cpu_count")
+    private Integer cpuCount;
 
-    @Column(name = "disk", length = 20)
-    private String disk;
+    @Column(name = "cpu_cores")
+    private Integer cpuCores;
 
-    @Column(name = "usage_role", length = 50)
-    private String usageRole;
+    @Column(name = "ram_gb")
+    private Integer ramGb;
 
-    @Column(name = "is_app_server")
-    private Boolean isAppServer;
+    @Column(name = "disk_size", length = 50)
+    private String diskSize;
+
+    @Column(name = "software", length = 100)
+    private String software;
 
     @Column(name = "ssh_username", length = 100)
     private String sshUsername;
@@ -83,14 +80,11 @@ public class Server {
     @Column(name = "ssh_port")
     private Integer sshPort;
 
-    @Column(name = "remark", columnDefinition = "TEXT")
-    private String remark;
+    @Column(name = "remarks", columnDefinition = "TEXT")
+    private String remarks;
 
     @Column(name = "tadp_hostname", length = 200)
     private String tadpHostname;
-
-    @Column(name = "tadp_ref", length = 100)
-    private String tadpRef;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 20)

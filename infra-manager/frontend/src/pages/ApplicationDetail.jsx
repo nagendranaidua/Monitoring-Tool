@@ -27,6 +27,8 @@ import {
   Tooltip,
   Divider,
   LinearProgress,
+  Paper,
+  CircularProgress,
 } from '@mui/material';
 import { DataGrid, GridToolbarFilterButton } from '@mui/x-data-grid';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -40,6 +42,10 @@ import MemoryIcon from '@mui/icons-material/Memory';
 import StorageIcon from '@mui/icons-material/Storage';
 import SpeedIcon from '@mui/icons-material/Speed';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import MiscellaneousServicesIcon from '@mui/icons-material/MiscellaneousServices';
 import { useSnackbar } from 'notistack';
 
 import { useAuth } from '../context/AuthContext';
@@ -60,24 +66,27 @@ import {
   deleteService,
   getEurekaMismatches,
   syncEureka,
+  discoverServicesFromEureka,
 } from '../api/endpoints';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const EMPTY_SERVER = {
-  machineName: '',
+  serverName: '',
   alias: '',
   ipAddress: '',
   environment: '',
-  availabilityZone: '',
   datacenter: '',
-  os: '',
+  zone: '',
+  osType: '',
   osVersion: '',
-  vmType: '',
+  serverType: '',
+  cpuCount: '',
   cpuCores: '',
   ramGb: '',
-  diskGb: '',
-  usageRole: '',
+  diskSize: '',
+  software: '',
+  remarks: '',
   status: 'ACTIVE',
 };
 
@@ -136,8 +145,8 @@ export default function ApplicationDetail() {
   const [quickFilters, setQuickFilters] = useState({
     environment: '',
     datacenter: '',
-    availabilityZone: '',
-    usageRole: '',
+    zone: '',
+    software: '',
   });
   const [serverDialogOpen, setServerDialogOpen] = useState(false);
   const [editingServer, setEditingServer] = useState(null);
@@ -161,6 +170,7 @@ export default function ApplicationDetail() {
   const [mismatches, setMismatches] = useState([]);
   const [mismatchesLoading, setMismatchesLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [discovering, setDiscovering] = useState(false);
 
   // ─── Fetch Application ──────────────────────────────────────────────────
 
@@ -273,37 +283,38 @@ export default function ApplicationDetail() {
     e.stopPropagation();
     setEditingServer(server);
     setServerForm({
-      machineName: server.machineName || '',
+      serverName: server.serverName || '',
       alias: server.alias || '',
       ipAddress: server.ipAddress || '',
       environment: server.environment || '',
-      availabilityZone: server.availabilityZone || '',
       datacenter: server.datacenter || '',
-      os: server.os || '',
+      zone: server.zone || '',
+      osType: server.osType || '',
       osVersion: server.osVersion || '',
-      vmType: server.vmType || '',
+      serverType: server.serverType || '',
+      cpuCount: server.cpuCount ?? '',
       cpuCores: server.cpuCores ?? '',
       ramGb: server.ramGb ?? '',
-      diskGb: server.diskGb ?? '',
-      usageRole: server.usageRole || '',
+      diskSize: server.diskSize || '',
+      software: server.software || '',
+      remarks: server.remarks || '',
       status: server.status || 'ACTIVE',
     });
     setServerDialogOpen(true);
   };
 
   const handleSaveServer = async () => {
-    if (!serverForm.machineName.trim()) {
-      enqueueSnackbar('Machine name is required', { variant: 'warning' });
+    if (!serverForm.serverName.trim()) {
+      enqueueSnackbar('Server name is required', { variant: 'warning' });
       return;
     }
     try {
       setSavingServer(true);
       const payload = {
         ...serverForm,
+        cpuCount: serverForm.cpuCount ? Number(serverForm.cpuCount) : null,
         cpuCores: serverForm.cpuCores ? Number(serverForm.cpuCores) : null,
         ramGb: serverForm.ramGb ? Number(serverForm.ramGb) : null,
-        diskGb: serverForm.diskGb ? Number(serverForm.diskGb) : null,
-        basePort: serverForm.basePort ? Number(serverForm.basePort) : null,
       };
       if (editingServer) {
         await updateServer(editingServer.id, payload);
@@ -437,33 +448,61 @@ export default function ApplicationDetail() {
     }
   };
 
+  // ─── Discover from Eureka ────────────────────────────────────────────
+
+  const handleDiscoverFromEureka = async () => {
+    try {
+      setDiscovering(true);
+      const res = await discoverServicesFromEureka(appId);
+      const { importedCount, importedServices } = res.data;
+      if (importedCount === 0) {
+        enqueueSnackbar('No new services found in Eureka registry. All services are already configured.', {
+          variant: 'info',
+        });
+      } else {
+        enqueueSnackbar(
+          `Discovered and imported ${importedCount} service(s) from Eureka: ${importedServices.join(', ')}`,
+          { variant: 'success' }
+        );
+        fetchServices();
+      }
+    } catch (err) {
+      enqueueSnackbar(
+        err.response?.data?.message || 'Failed to discover services from Eureka. Check the Eureka URL configuration.',
+        { variant: 'error' }
+      );
+    } finally {
+      setDiscovering(false);
+    }
+  };
+
   // ─── Filtered Servers ──────────────────────────────────────────────────
 
   const filteredServers = servers.filter((s) => {
     if (quickFilters.environment && s.environment !== quickFilters.environment) return false;
     if (quickFilters.datacenter && s.datacenter !== quickFilters.datacenter) return false;
-    if (quickFilters.availabilityZone && s.availabilityZone !== quickFilters.availabilityZone)
-      return false;
-    if (quickFilters.usageRole && s.usageRole !== quickFilters.usageRole) return false;
+    if (quickFilters.zone && s.zone !== quickFilters.zone) return false;
+    if (quickFilters.software && s.software !== quickFilters.software) return false;
     return true;
   });
 
   // ─── DataGrid Columns ─────────────────────────────────────────────────
 
   const serverColumns = [
-    { field: 'machineName', headerName: 'Machine Name', flex: 1, minWidth: 140, filterable: true },
+    { field: 'serverName', headerName: 'Server Name', flex: 1, minWidth: 140, filterable: true },
     { field: 'alias', headerName: 'Alias', flex: 0.8, minWidth: 110, filterable: true },
     { field: 'ipAddress', headerName: 'IP Address', flex: 0.9, minWidth: 130, filterable: true },
     { field: 'environment', headerName: 'Environment', flex: 0.7, minWidth: 110, filterable: true },
-    { field: 'availabilityZone', headerName: 'AZ', flex: 0.5, minWidth: 70, filterable: true },
-    { field: 'datacenter', headerName: 'Datacenter', flex: 0.7, minWidth: 110, filterable: true },
-    { field: 'os', headerName: 'OS', flex: 0.5, minWidth: 80, filterable: true },
+    { field: 'zone', headerName: 'Zone', flex: 0.5, minWidth: 70, filterable: true },
+    { field: 'datacenter', headerName: 'Data Center', flex: 0.7, minWidth: 110, filterable: true },
+    { field: 'osType', headerName: 'OS Type', flex: 0.5, minWidth: 80, filterable: true },
     { field: 'osVersion', headerName: 'OS Version', flex: 0.6, minWidth: 90, filterable: true },
-    { field: 'vmType', headerName: 'VM Type', flex: 0.6, minWidth: 90, filterable: true },
-    { field: 'cpuCores', headerName: 'CPU', flex: 0.4, minWidth: 60, type: 'number', filterable: true },
+    { field: 'serverType', headerName: 'Server Type', flex: 0.6, minWidth: 90, filterable: true },
+    { field: 'cpuCount', headerName: 'CPU Count', flex: 0.4, minWidth: 70, type: 'number', filterable: true },
+    { field: 'cpuCores', headerName: 'CPU Cores', flex: 0.4, minWidth: 70, type: 'number', filterable: true },
     { field: 'ramGb', headerName: 'RAM (GB)', flex: 0.5, minWidth: 80, type: 'number', filterable: true },
-    { field: 'diskGb', headerName: 'Disk (GB)', flex: 0.5, minWidth: 80, type: 'number', filterable: true },
-    { field: 'usageRole', headerName: 'Usage Role', flex: 0.7, minWidth: 100, filterable: true },
+    { field: 'diskSize', headerName: 'Disk Size', flex: 0.5, minWidth: 80, filterable: true },
+    { field: 'software', headerName: 'Software', flex: 0.7, minWidth: 100, filterable: true },
     {
       field: 'status',
       headerName: 'Status',
@@ -584,7 +623,7 @@ export default function ApplicationDetail() {
               sx={{ minWidth: 150 }}
             >
               <MenuItem value="">All</MenuItem>
-              {(filterOptions.environments || []).map((v) => (
+              {(filterOptions.environment || []).map((v) => (
                 <MenuItem key={v} value={v}>
                   {v}
                 </MenuItem>
@@ -600,7 +639,7 @@ export default function ApplicationDetail() {
               sx={{ minWidth: 150 }}
             >
               <MenuItem value="">All</MenuItem>
-              {(filterOptions.datacenters || []).map((v) => (
+              {(filterOptions.datacenter || []).map((v) => (
                 <MenuItem key={v} value={v}>
                   {v}
                 </MenuItem>
@@ -609,16 +648,16 @@ export default function ApplicationDetail() {
 
             <TextField
               select
-              label="AZ"
+              label="Zone"
               size="small"
-              value={quickFilters.availabilityZone}
+              value={quickFilters.zone}
               onChange={(e) =>
-                setQuickFilters((f) => ({ ...f, availabilityZone: e.target.value }))
+                setQuickFilters((f) => ({ ...f, zone: e.target.value }))
               }
               sx={{ minWidth: 120 }}
             >
               <MenuItem value="">All</MenuItem>
-              {(filterOptions.availabilityZones || []).map((v) => (
+              {(filterOptions.zone || []).map((v) => (
                 <MenuItem key={v} value={v}>
                   {v}
                 </MenuItem>
@@ -627,14 +666,14 @@ export default function ApplicationDetail() {
 
             <TextField
               select
-              label="Usage Role"
+              label="Software"
               size="small"
-              value={quickFilters.usageRole}
-              onChange={(e) => setQuickFilters((f) => ({ ...f, usageRole: e.target.value }))}
+              value={quickFilters.software}
+              onChange={(e) => setQuickFilters((f) => ({ ...f, software: e.target.value }))}
               sx={{ minWidth: 150 }}
             >
               <MenuItem value="">All</MenuItem>
-              {(filterOptions.usageRoles || []).map((v) => (
+              {(filterOptions.software || []).map((v) => (
                 <MenuItem key={v} value={v}>
                   {v}
                 </MenuItem>
@@ -683,13 +722,27 @@ export default function ApplicationDetail() {
       {/* ──────── Services Tab ──────── */}
       {tab === 1 && (
         <Box>
-          <Stack direction="row" justifyContent="flex-end" sx={{ mb: 2 }}>
-            {isAdmin && (
-              <Button variant="contained" startIcon={<AddIcon />} onClick={openAddService}>
-                Add Service
-              </Button>
-            )}
-          </Stack>
+          {services.length > 0 && (
+            <Stack direction="row" justifyContent="flex-end" spacing={1} sx={{ mb: 2 }}>
+              {isAdmin && app?.eurekaEnabled && (
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  startIcon={discovering ? <CircularProgress size={16} /> : <CloudDownloadIcon />}
+                  onClick={handleDiscoverFromEureka}
+                  disabled={discovering}
+                  size="small"
+                >
+                  {discovering ? 'Discovering...' : 'Import from Eureka'}
+                </Button>
+              )}
+              {isAdmin && (
+                <Button variant="contained" startIcon={<AddIcon />} onClick={openAddService}>
+                  Add Service
+                </Button>
+              )}
+            </Stack>
+          )}
 
           {servicesLoading ? (
             <Grid container spacing={3}>
@@ -704,12 +757,95 @@ export default function ApplicationDetail() {
               ))}
             </Grid>
           ) : services.length === 0 ? (
-            <Box sx={{ textAlign: 'center', py: 8 }}>
-              <StorageIcon sx={{ fontSize: 64, color: 'text.disabled' }} />
-              <Typography variant="h6" color="text.secondary" sx={{ mt: 1 }}>
-                No services configured
+            <Paper
+              variant="outlined"
+              sx={{
+                textAlign: 'center',
+                py: 8,
+                px: 4,
+                borderStyle: 'dashed',
+                borderColor: 'divider',
+                backgroundColor: 'action.hover',
+                borderRadius: 3,
+              }}
+            >
+              <MiscellaneousServicesIcon sx={{ fontSize: 72, color: 'text.disabled', mb: 2 }} />
+              <Typography variant="h5" color="text.secondary" gutterBottom>
+                No services configured yet
               </Typography>
-            </Box>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 520, mx: 'auto' }}>
+                You can register services manually, import them from your Eureka service registry,
+                or upload an infrastructure Excel sheet in the Imports section.
+              </Typography>
+
+              <Stack
+                direction={{ xs: 'column', sm: 'row' }}
+                spacing={2}
+                justifyContent="center"
+                alignItems="center"
+              >
+                {/* Option 1: Add manually */}
+                {isAdmin && (
+                  <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={openAddService}
+                    size="large"
+                  >
+                    Add Service Manually
+                  </Button>
+                )}
+
+                {/* Option 2: Discover from Eureka (only if app has Eureka configured) */}
+                {isAdmin && app?.eurekaEnabled && (
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    startIcon={discovering ? <CircularProgress size={18} /> : <CloudDownloadIcon />}
+                    onClick={handleDiscoverFromEureka}
+                    disabled={discovering}
+                    size="large"
+                  >
+                    {discovering ? 'Discovering...' : 'Import from Eureka'}
+                  </Button>
+                )}
+
+                {/* Option 3: Go to Excel import */}
+                {isAdmin && (
+                  <Button
+                    variant="outlined"
+                    startIcon={<UploadFileIcon />}
+                    onClick={() => navigate('/import')}
+                    size="large"
+                  >
+                    Upload Excel
+                  </Button>
+                )}
+              </Stack>
+
+              {/* Eureka hint if not configured */}
+              {app && !app.eurekaEnabled && (
+                <Box
+                  sx={{
+                    mt: 4,
+                    p: 2,
+                    borderRadius: 2,
+                    backgroundColor: 'info.main',
+                    color: 'info.contrastText',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    maxWidth: 560,
+                  }}
+                >
+                  <InfoOutlinedIcon fontSize="small" />
+                  <Typography variant="body2">
+                    <strong>Tip:</strong> Configure a Eureka URL for this application to auto-discover registered services.
+                    Edit the application from the Dashboard to add the Eureka endpoint.
+                  </Typography>
+                </Box>
+              )}
+            </Paper>
           ) : (
             <Grid container spacing={3}>
               {services.map((svc) => (
@@ -892,19 +1028,21 @@ export default function ApplicationDetail() {
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 0.5 }}>
             {[
-              { key: 'machineName', label: 'Machine Name', required: true },
+              { key: 'serverName', label: 'Server Name', required: true },
               { key: 'alias', label: 'Alias' },
               { key: 'ipAddress', label: 'IP Address' },
               { key: 'environment', label: 'Environment' },
-              { key: 'availabilityZone', label: 'Availability Zone' },
-              { key: 'datacenter', label: 'Datacenter' },
-              { key: 'os', label: 'OS' },
+              { key: 'datacenter', label: 'Data Center' },
+              { key: 'zone', label: 'Zone' },
+              { key: 'osType', label: 'OS Type' },
               { key: 'osVersion', label: 'OS Version' },
-              { key: 'vmType', label: 'VM Type' },
+              { key: 'serverType', label: 'Server Type' },
+              { key: 'cpuCount', label: 'CPU Count', type: 'number' },
               { key: 'cpuCores', label: 'CPU Cores', type: 'number' },
               { key: 'ramGb', label: 'RAM (GB)', type: 'number' },
-              { key: 'diskGb', label: 'Disk (GB)', type: 'number' },
-              { key: 'usageRole', label: 'Usage Role' },
+              { key: 'diskSize', label: 'Disk Size' },
+              { key: 'software', label: 'Software' },
+              { key: 'remarks', label: 'Remarks' },
             ].map(({ key, label, required, type }) => (
               <Grid item xs={12} sm={6} md={4} key={key}>
                 <TextField
@@ -1077,7 +1215,7 @@ export default function ApplicationDetail() {
       <ConfirmDialog
         open={!!deleteServerTarget}
         title="Delete Server"
-        message={`Are you sure you want to delete "${deleteServerTarget?.machineName}"? All allocations on this server will also be removed.`}
+        message={`Are you sure you want to delete "${deleteServerTarget?.serverName}"? All allocations on this server will also be removed.`}
         confirmText="Delete"
         severity="error"
         onConfirm={handleDeleteServer}

@@ -399,7 +399,7 @@ export default function Snapshots() {
                         </ListItemIcon>
                         <ListItemText
                           primary={item.serviceName || item.description || JSON.stringify(item)}
-                          secondary={item.serverAlias || item.serverName}
+                          secondary={item.serverName || item.serverAlias}
                         />
                       </ListItem>
                     ))}
@@ -421,7 +421,7 @@ export default function Snapshots() {
                         </ListItemIcon>
                         <ListItemText
                           primary={item.serviceName || item.description || JSON.stringify(item)}
-                          secondary={item.serverAlias || item.serverName}
+                          secondary={item.serverName || item.serverAlias}
                         />
                       </ListItem>
                     ))}
@@ -445,7 +445,7 @@ export default function Snapshots() {
                           primary={item.serviceName || item.description || JSON.stringify(item)}
                           secondary={
                             item.change ||
-                            `${item.serverAlias || item.serverName || ''} - instances: ${item.oldCount ?? '?'} -> ${item.newCount ?? '?'}`
+                            `${item.serverName || item.serverAlias || ''} - instances: ${item.oldCount ?? '?'} -> ${item.newCount ?? '?'}`
                           }
                         />
                       </ListItem>

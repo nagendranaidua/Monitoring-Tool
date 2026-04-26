@@ -382,13 +382,13 @@ export default function ServerDetail() {
         <Box sx={{ flexGrow: 1 }}>
           <Stack direction="row" alignItems="center" spacing={2}>
             <Typography variant="h4" fontWeight={700}>
-              {server.alias || server.machineName}
+              {server.serverName}
             </Typography>
             <StatusChip status={server.status} />
           </Stack>
           {server.alias && (
             <Typography variant="body1" color="text.secondary">
-              {server.machineName}
+              {server.alias}
             </Typography>
           )}
         </Box>
@@ -416,17 +416,18 @@ export default function ServerDetail() {
           </Stack>
 
           <Grid container spacing={2}>
-            <DetailRow label="Availability Zone" value={server.availabilityZone} />
-            <DetailRow label="Datacenter" value={server.datacenter} />
-            <DetailRow label="OS" value={server.os} />
+            <DetailRow label="Zone" value={server.zone} />
+            <DetailRow label="Data Center" value={server.datacenter} />
+            <DetailRow label="OS Type" value={server.osType} />
             <DetailRow label="OS Version" value={server.osVersion} />
-            <DetailRow label="VM Type" value={server.vmType} />
+            <DetailRow label="Server Type" value={server.serverType} />
+            <DetailRow label="CPU Count" value={server.cpuCount} />
             <DetailRow label="CPU Cores" value={server.cpuCores} />
             <DetailRow label="RAM (GB)" value={server.ramGb} />
-            <DetailRow label="Disk (GB)" value={server.diskGb} />
-            <DetailRow label="Usage Role" value={server.usageRole} />
+            <DetailRow label="Disk Size" value={server.diskSize} />
+            <DetailRow label="Software" value={server.software} />
             <DetailRow label="SSH Port" value={server.sshPort || '22'} />
-            <DetailRow label="Remark" value={server.remark} />
+            <DetailRow label="Remarks" value={server.remarks} />
           </Grid>
         </CardContent>
       </Card>
@@ -724,7 +725,7 @@ export default function ServerDetail() {
               ) : (
                 moveServers.map((s) => (
                   <MenuItem key={s.id} value={s.id}>
-                    {s.alias || s.machineName} ({s.ipAddress})
+                    {s.serverName || s.alias} ({s.ipAddress})
                   </MenuItem>
                 ))
               )}

@@ -18,27 +18,25 @@ CREATE TABLE IF NOT EXISTS applications (
 CREATE TABLE IF NOT EXISTS servers (
     id                  BIGSERIAL PRIMARY KEY,
     application_id      BIGINT NOT NULL REFERENCES applications(id),
-    machine_name        VARCHAR(100) NOT NULL,
+    server_name         VARCHAR(200) NOT NULL,
     alias               VARCHAR(100),
     ip_address          VARCHAR(45) NOT NULL,
-    environment         VARCHAR(30) NOT NULL DEFAULT 'PRODUCTION',
-    availability_zone   VARCHAR(10),
-    datacenter          VARCHAR(50),
-    os                  VARCHAR(30),
-    vm_server           BOOLEAN DEFAULT FALSE,
-    vm_type             VARCHAR(30),
+    environment         VARCHAR(50) NOT NULL DEFAULT 'PRODUCTION',
+    datacenter          VARCHAR(100),
+    zone                VARCHAR(10),
+    os_type             VARCHAR(30),
     os_version          VARCHAR(30),
-    cpu                 INTEGER,
-    ram                 VARCHAR(20),
-    disk                VARCHAR(20),
-    usage_role          VARCHAR(50),
-    is_app_server       BOOLEAN DEFAULT FALSE,
+    server_type         VARCHAR(100),
+    cpu_count           INTEGER,
+    cpu_cores           INTEGER,
+    ram_gb              INTEGER,
+    disk_size           VARCHAR(50),
+    software            VARCHAR(100),
     ssh_username        VARCHAR(100),
     ssh_password_enc    VARCHAR(500),
     ssh_port            INTEGER DEFAULT 22,
-    remark              TEXT,
+    remarks             TEXT,
     tadp_hostname       VARCHAR(200),
-    tadp_ref            VARCHAR(100),
     status              VARCHAR(20) DEFAULT 'ACTIVE',
     created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -47,7 +45,7 @@ CREATE TABLE IF NOT EXISTS servers (
 CREATE INDEX idx_servers_app ON servers(application_id);
 CREATE INDEX idx_servers_env ON servers(environment);
 CREATE INDEX idx_servers_dc ON servers(datacenter);
-CREATE INDEX idx_servers_usage ON servers(usage_role);
+CREATE INDEX idx_servers_software ON servers(software);
 
 -- 3. Services (Microservices) — scoped per application
 CREATE TABLE IF NOT EXISTS services (

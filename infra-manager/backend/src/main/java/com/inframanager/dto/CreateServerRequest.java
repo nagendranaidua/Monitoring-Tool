@@ -17,9 +17,9 @@ public class CreateServerRequest {
     @NotNull(message = "Application ID is required")
     private Long applicationId;
 
-    @NotBlank(message = "Machine name is required")
-    @Size(max = 100, message = "Machine name must not exceed 100 characters")
-    private String machineName;
+    @NotBlank(message = "Server name is required")
+    @Size(max = 200, message = "Server name must not exceed 200 characters")
+    private String serverName;
 
     @Size(max = 100, message = "Alias must not exceed 100 characters")
     private String alias;
@@ -29,34 +29,33 @@ public class CreateServerRequest {
     private String ipAddress;
 
     @NotBlank(message = "Environment is required")
-    @Size(max = 30, message = "Environment must not exceed 30 characters")
+    @Size(max = 50, message = "Environment must not exceed 50 characters")
     private String environment;
 
-    @Size(max = 10, message = "Availability zone must not exceed 10 characters")
-    private String availabilityZone;
-
-    @Size(max = 50, message = "Datacenter must not exceed 50 characters")
+    @Size(max = 100, message = "Datacenter must not exceed 100 characters")
     private String datacenter;
 
-    @Size(max = 30, message = "OS must not exceed 30 characters")
-    private String os;
+    @Size(max = 10, message = "Zone must not exceed 10 characters")
+    private String zone;
 
-    private Boolean vmServer;
-
-    @Size(max = 30, message = "VM type must not exceed 30 characters")
-    private String vmType;
+    @Size(max = 30, message = "OS type must not exceed 30 characters")
+    private String osType;
 
     @Size(max = 30, message = "OS version must not exceed 30 characters")
     private String osVersion;
 
-    private Integer cpu;
-    private String ram;
-    private String disk;
+    @Size(max = 100, message = "Server type must not exceed 100 characters")
+    private String serverType;
 
-    @Size(max = 50, message = "Usage role must not exceed 50 characters")
-    private String usageRole;
+    private Integer cpuCount;
+    private Integer cpuCores;
+    private Integer ramGb;
 
-    private Boolean isAppServer;
+    @Size(max = 50, message = "Disk size must not exceed 50 characters")
+    private String diskSize;
+
+    @Size(max = 100, message = "Software must not exceed 100 characters")
+    private String software;
 
     @Size(max = 100, message = "SSH username must not exceed 100 characters")
     private String sshUsername;
@@ -65,13 +64,10 @@ public class CreateServerRequest {
 
     private Integer sshPort;
 
-    private String remark;
+    private String remarks;
 
     @Size(max = 200, message = "TADP hostname must not exceed 200 characters")
     private String tadpHostname;
-
-    @Size(max = 100, message = "TADP ref must not exceed 100 characters")
-    private String tadpRef;
 
     private String status;
 }

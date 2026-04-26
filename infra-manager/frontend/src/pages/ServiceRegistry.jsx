@@ -774,7 +774,7 @@ export default function ServiceRegistry() {
                               </TableCell>
                               <TableCell>
                                 <Typography fontWeight={500}>
-                                  {alloc.serverAlias || alloc.serverName || `Server #${alloc.serverId}`}
+                                  {alloc.serverName || alloc.serverAlias || `Server #${alloc.serverId}`}
                                 </Typography>
                               </TableCell>
                               <TableCell>{alloc.serverIp || '--'}</TableCell>
@@ -995,7 +995,7 @@ export default function ServiceRegistry() {
               ) : (
                 moveServers.map((s) => (
                   <MenuItem key={s.id} value={s.id}>
-                    {s.alias || s.machineName} ({s.ipAddress})
+                    {s.serverName || s.alias} ({s.ipAddress})
                   </MenuItem>
                 ))
               )}
@@ -1072,7 +1072,7 @@ export default function ServiceRegistry() {
               ) : (
                 allocServers.map((s) => (
                   <MenuItem key={s.id} value={s.id}>
-                    {s.alias || s.machineName} ({s.ipAddress})
+                    {s.serverName || s.alias} ({s.ipAddress})
                   </MenuItem>
                 ))
               )}

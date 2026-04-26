@@ -51,26 +51,24 @@ public class ServerService {
 
         Server server = Server.builder()
                 .application(app)
-                .machineName(request.getMachineName())
+                .serverName(request.getServerName())
                 .alias(request.getAlias())
                 .ipAddress(request.getIpAddress())
                 .environment(request.getEnvironment())
-                .availabilityZone(request.getAvailabilityZone())
                 .datacenter(request.getDatacenter())
-                .os(request.getOs())
-                .vmServer(request.getVmServer())
-                .vmType(request.getVmType())
+                .zone(request.getZone())
+                .osType(request.getOsType())
                 .osVersion(request.getOsVersion())
-                .cpu(request.getCpu())
-                .ram(request.getRam())
-                .disk(request.getDisk())
-                .usageRole(request.getUsageRole())
-                .isAppServer(request.getIsAppServer())
+                .serverType(request.getServerType())
+                .cpuCount(request.getCpuCount())
+                .cpuCores(request.getCpuCores())
+                .ramGb(request.getRamGb())
+                .diskSize(request.getDiskSize())
+                .software(request.getSoftware())
                 .sshUsername(request.getSshUsername())
                 .sshPort(request.getSshPort() != null ? request.getSshPort() : 22)
-                .remark(request.getRemark())
+                .remarks(request.getRemarks())
                 .tadpHostname(request.getTadpHostname())
-                .tadpRef(request.getTadpRef())
                 .status(request.getStatus() != null ? Server.Status.valueOf(request.getStatus()) : Server.Status.ACTIVE)
                 .build();
 
@@ -79,7 +77,7 @@ public class ServerService {
         }
 
         server = serverRepository.save(server);
-        log.info("Created server: {} (id={}) for application: {}", server.getMachineName(), server.getId(), appId);
+        log.info("Created server: {} (id={}) for application: {}", server.getServerName(), server.getId(), appId);
         return toDto(server);
     }
 
@@ -88,26 +86,24 @@ public class ServerService {
         Server server = serverRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Server not found with id: " + id));
 
-        server.setMachineName(request.getMachineName());
+        server.setServerName(request.getServerName());
         server.setAlias(request.getAlias());
         server.setIpAddress(request.getIpAddress());
         server.setEnvironment(request.getEnvironment());
-        server.setAvailabilityZone(request.getAvailabilityZone());
         server.setDatacenter(request.getDatacenter());
-        server.setOs(request.getOs());
-        server.setVmServer(request.getVmServer());
-        server.setVmType(request.getVmType());
+        server.setZone(request.getZone());
+        server.setOsType(request.getOsType());
         server.setOsVersion(request.getOsVersion());
-        server.setCpu(request.getCpu());
-        server.setRam(request.getRam());
-        server.setDisk(request.getDisk());
-        server.setUsageRole(request.getUsageRole());
-        server.setIsAppServer(request.getIsAppServer());
+        server.setServerType(request.getServerType());
+        server.setCpuCount(request.getCpuCount());
+        server.setCpuCores(request.getCpuCores());
+        server.setRamGb(request.getRamGb());
+        server.setDiskSize(request.getDiskSize());
+        server.setSoftware(request.getSoftware());
         server.setSshUsername(request.getSshUsername());
         server.setSshPort(request.getSshPort());
-        server.setRemark(request.getRemark());
+        server.setRemarks(request.getRemarks());
         server.setTadpHostname(request.getTadpHostname());
-        server.setTadpRef(request.getTadpRef());
 
         if (request.getStatus() != null) {
             server.setStatus(Server.Status.valueOf(request.getStatus()));
@@ -117,7 +113,7 @@ public class ServerService {
         }
 
         server = serverRepository.save(server);
-        log.info("Updated server: {} (id={})", server.getMachineName(), server.getId());
+        log.info("Updated server: {} (id={})", server.getServerName(), server.getId());
         return toDto(server);
     }
 
@@ -127,7 +123,7 @@ public class ServerService {
                 .orElseThrow(() -> new EntityNotFoundException("Server not found with id: " + id));
         server.setStatus(Server.Status.INACTIVE);
         serverRepository.save(server);
-        log.info("Soft-deleted server: {} (id={})", server.getMachineName(), server.getId());
+        log.info("Soft-deleted server: {} (id={})", server.getServerName(), server.getId());
     }
 
     public List<ServerDto> filterServers(Long appId, ServerFilterRequest filter) {
@@ -139,7 +135,7 @@ public class ServerService {
                 appId,
                 filter.getEnvironment(),
                 filter.getDatacenter(),
-                filter.getUsageRole(),
+                filter.getSoftware(),
                 status
         ).stream().map(this::toDto).collect(Collectors.toList());
     }
@@ -150,10 +146,10 @@ public class ServerService {
         Map<String, List<String>> options = new LinkedHashMap<>();
         options.put("environment", extractDistinct(servers, Server::getEnvironment));
         options.put("datacenter", extractDistinct(servers, Server::getDatacenter));
-        options.put("availabilityZone", extractDistinct(servers, Server::getAvailabilityZone));
-        options.put("usageRole", extractDistinct(servers, Server::getUsageRole));
-        options.put("os", extractDistinct(servers, Server::getOs));
-        options.put("vmType", extractDistinct(servers, Server::getVmType));
+        options.put("zone", extractDistinct(servers, Server::getZone));
+        options.put("software", extractDistinct(servers, Server::getSoftware));
+        options.put("osType", extractDistinct(servers, Server::getOsType));
+        options.put("serverType", extractDistinct(servers, Server::getServerType));
         options.put("status", extractDistinct(servers, s -> s.getStatus() != null ? s.getStatus().name() : null));
 
         return options;
@@ -173,26 +169,24 @@ public class ServerService {
         return ServerDto.builder()
                 .id(server.getId())
                 .applicationId(server.getApplication().getId())
-                .machineName(server.getMachineName())
+                .serverName(server.getServerName())
                 .alias(server.getAlias())
                 .ipAddress(server.getIpAddress())
                 .environment(server.getEnvironment())
-                .availabilityZone(server.getAvailabilityZone())
                 .datacenter(server.getDatacenter())
-                .os(server.getOs())
-                .vmServer(server.getVmServer())
-                .vmType(server.getVmType())
+                .zone(server.getZone())
+                .osType(server.getOsType())
                 .osVersion(server.getOsVersion())
-                .cpu(server.getCpu())
-                .ram(server.getRam())
-                .disk(server.getDisk())
-                .usageRole(server.getUsageRole())
-                .isAppServer(server.getIsAppServer())
+                .serverType(server.getServerType())
+                .cpuCount(server.getCpuCount())
+                .cpuCores(server.getCpuCores())
+                .ramGb(server.getRamGb())
+                .diskSize(server.getDiskSize())
+                .software(server.getSoftware())
                 .sshUsername(server.getSshUsername())
                 .sshPort(server.getSshPort())
-                .remark(server.getRemark())
+                .remarks(server.getRemarks())
                 .tadpHostname(server.getTadpHostname())
-                .tadpRef(server.getTadpRef())
                 .status(server.getStatus() != null ? server.getStatus().name() : null)
                 .createdAt(server.getCreatedAt())
                 .updatedAt(server.getUpdatedAt())

@@ -130,6 +130,7 @@ export default function AllocationBoard() {
         return {
           ...a,
           serviceName: svc?.name || a.serviceName || 'Unknown',
+          serverName: a._server?.serverName || '',
           serverAlias: a._server?.alias || '',
           serverIp: a._server?.ipAddress || '',
           serverEnvironment: a._server?.environment || '',
@@ -250,7 +251,7 @@ export default function AllocationBoard() {
 
   const tableColumns = [
     { field: 'serviceName', headerName: 'Service Name', flex: 1, minWidth: 150 },
-    { field: 'serverAlias', headerName: 'Server Alias', flex: 0.8, minWidth: 120 },
+    { field: 'serverName', headerName: 'Server Name', flex: 0.8, minWidth: 120 },
     { field: 'serverIp', headerName: 'Server IP', flex: 0.8, minWidth: 130 },
     {
       field: 'plannedInstances',
@@ -359,7 +360,7 @@ export default function AllocationBoard() {
               {/* Server column header */}
               <Stack spacing={0.5} sx={{ mb: 2 }}>
                 <Typography variant="subtitle1" fontWeight={700} noWrap>
-                  {srv.alias || srv.machineName}
+                  {srv.serverName || srv.alias}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
                   {srv.ipAddress}
@@ -571,7 +572,7 @@ export default function AllocationBoard() {
             >
               {servers.map((srv) => (
                 <MenuItem key={srv.id} value={srv.id}>
-                  {srv.alias || srv.machineName} ({srv.ipAddress})
+                  {srv.serverName || srv.alias} ({srv.ipAddress})
                 </MenuItem>
               ))}
             </TextField>
@@ -626,7 +627,7 @@ export default function AllocationBoard() {
               .filter((srv) => srv.id !== moveTarget?.serverId)
               .map((srv) => (
                 <MenuItem key={srv.id} value={srv.id}>
-                  {srv.alias || srv.machineName} ({srv.ipAddress})
+                  {srv.serverName || srv.alias} ({srv.ipAddress})
                 </MenuItem>
               ))}
           </TextField>
